@@ -7,6 +7,8 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/dashboard/:path*", // Melindungi semua rute di bawah /dashboard
+    "/auth/:path*", // Melindungi semua rute di bawah /auth
     /*
      * Match all request paths except:
      * - _next/static (static files)
