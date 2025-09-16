@@ -1,59 +1,49 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
-import { supabase } from '@/lib/supabaseClient'; // ✅ gunakan client-side Supabase
-import { Button } from '@/components/ui/button';
+import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export function UpdatePasswordForm({
   className,
   ...props
-}: React.ComponentPropsWithoutRef<'div'>) {
-  const [password, setPassword] = useState('');
+}: React.ComponentPropsWithoutRef<"div">) {
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      // Pastikan user sudah login
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user?.id) {
-        throw new Error('User session not found. Please log in again.');
-      }
-
-      // Update password
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
-
-      router.push('/dashboard'); // ✅ arahkan ke halaman setelah update
+      // Update this route to redirect to an authenticated route. The user already has an active session.
+      router.push("/protected");
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+      setError(error instanceof Error ? error.message : "An error occurred");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Reset Your Password</CardTitle>
@@ -77,7 +67,7 @@ export function UpdatePasswordForm({
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Save new password'}
+                {isLoading ? "Saving..." : "Save new password"}
               </Button>
             </div>
           </form>
